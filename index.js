@@ -28,6 +28,7 @@ async function run() {
     try {
         const userCollection = client.db('cambazar').collection('users')
         const categoriesCollection = client.db('cambazar').collection('categories')
+        const productsCollection = client.db('cambazar').collection('products')
 
         // Get Categories Data
         app.get('/categories', async (req, res) => {
@@ -35,6 +36,16 @@ async function run() {
             const result = await categoriesCollection.find(query).toArray();
             res.send(result);
         })
+
+        // Get Single Category Details
+        app.get('/category/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            results = await categoriesCollection.findOne(query);
+            res.send(results)
+        })
+
+
 
         //get all users
         app.get('/users', async (req, res) => {
@@ -44,17 +55,59 @@ async function run() {
 
         })
 
-
-
-
         //get all buyers or Sellers
         app.get('/user/:role', async (req, res) => {
             const role = req.params.role
             const query = { role: role };
             const result = await userCollection.find(query).toArray();
             res.send(result)
-
         })
+
+
+        // Get Advertise Product For Home Page 
+        app.get('/products', async (req, res) => {
+            const query = { 'advertisement': true, 'status': 'available' }
+            const results = await productsCollection.find(query).toArray();
+            res.send(results)
+        })
+
+        // Get Category Wise Products
+        app.get('/products/:category', async (req, res) => {
+            const category = req.params.category
+            const query = { category: category }
+            results = await productsCollection.find(query).toArray();
+            res.send(results)
+        })
+
+        // Get Single Product Details
+        app.get('/product/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            results = await productsCollection.findOne(query);
+            res.send(results)
+        })
+
+        // Add Reported Product
+        app.put('/product/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true }
+            const reported = req.body
+            const updateDoc = {
+                $set: {
+                    reported: true
+                }
+            }
+            const result = await productsCollection.updateOne(filter, updateDoc, options)
+            res.send(result)
+        })
+
+        app.get('/reported', async (req, res) => {
+            const query = {}
+            results = await productsCollection.find(query).toArray();
+            res.send(results)
+        })
+
 
         // Verify Sellers
         app.put('/user/:id', async (req, res) => {
