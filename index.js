@@ -27,7 +27,21 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         const userCollection = client.db('cambazar').collection('users')
-        console.log('Database Connected')
+        const categoriesCollection = client.db('cambazar').collection('categories')
+
+
+        app.get('/categories', async (req, res) => {
+            const query = {}
+            const result = await categoriesCollection.find(query).toArray()
+            console.log(result)
+            res.send(result)
+
+        })
+
+
+
+
+
 
         // User Email and JwT
         app.put('/user/:email', async (req, res) => {
@@ -47,7 +61,14 @@ async function run() {
                 token: token
             })
         })
+
+
+
     }
+
+
+
+
     finally { }
 }
 
