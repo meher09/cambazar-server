@@ -2,7 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const jwt = require('jsonwebtoken')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
-const { request } = require('express')
+const { request, query } = require('express')
 require('dotenv').config()
 
 const app = express()
@@ -29,14 +29,52 @@ async function run() {
         const userCollection = client.db('cambazar').collection('users')
         const categoriesCollection = client.db('cambazar').collection('categories')
 
-
+        // Get Categories Data
         app.get('/categories', async (req, res) => {
-            const query = {}
-            const result = await categoriesCollection.find(query).toArray()
-            console.log(result)
+            const query = {};
+            const result = await categoriesCollection.find(query).toArray();
+            res.send(result);
+        })
+
+        //get all users
+        app.get('/users', async (req, res) => {
+            const query = {};
+            const result = await userCollection.find(query).toArray();
             res.send(result)
 
         })
+
+
+
+
+        //get all buyers or Sellers
+        app.get('/user/:role', async (req, res) => {
+            const role = req.params.role
+            const query = { role: role };
+            const result = await userCollection.find(query).toArray();
+            res.send(result)
+
+        })
+
+        // Verify Sellers
+        app.put('/user/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true }
+            const updateDoc = {
+                $set: {
+                    verified: true
+                }
+            }
+            const result = await userCollection.updateOne(filter, updateDoc, options)
+            res.send(result)
+        })
+
+
+
+
+
+
 
 
 
@@ -53,7 +91,6 @@ async function run() {
                 $set: user
             }
             const result = await userCollection.updateOne(filter, updateDoc, options)
-            console.log(result)
             const token = jwt.sign(user, process.env.JWT_TOKEN_SECRET, { expiresIn: '1d' })
             res.send({
                 success: true,
