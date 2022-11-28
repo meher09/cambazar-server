@@ -118,6 +118,13 @@ async function run() {
             })
         })
 
+        app.delete('/user/:email', async (req, res) => {
+            const email = req.params.email
+            const query = { email: email }
+            const result = await userCollection.deleteOne(query)
+            res.send(result)
+        })
+
 
         /*
          * Product Query Areas
@@ -144,7 +151,7 @@ async function run() {
         // Get Category Wise Products
         app.get('/products/:category', async (req, res) => {
             const category = req.params.category
-            const query = { category: category }
+            const query = { category: category, status: "available" }
             const results = await productsCollection.find(query).toArray();
             res.send(results)
         })
