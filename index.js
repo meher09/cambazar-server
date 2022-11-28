@@ -43,7 +43,7 @@ async function run() {
         app.get('/category/:id', async (req, res) => {
             const id = req.params.id
             const query = { _id: ObjectId(id) }
-            results = await categoriesCollection.findOne(query);
+            const results = await categoriesCollection.findOne(query);
             res.send(results)
         })
 
@@ -80,37 +80,9 @@ async function run() {
 
 
 
-        // Get Single Product Details
-        app.get('/product/:id', async (req, res) => {
-            const id = req.params.id
-            const query = { _id: ObjectId(id) }
-            results = await productsCollection.findOne(query);
-            res.send(results)
-        })
 
 
 
-        // Add Reported Product
-        app.put('/product/reported/:id', async (req, res) => {
-            const id = req.params.id
-            const filter = { _id: ObjectId(id) }
-            const options = { upsert: true }
-            const data = req.body
-            const updateDoc = {
-                $set: data
-            }
-            const result = await productsCollection.updateOne(filter, updateDoc, options)
-            res.send(result)
-        })
-
-
-
-        // Get Reported Content
-        app.get('/products/reported', async (req, res) => {
-            const query = { reported: true }
-            results = await productsCollection.find(query).toArray();
-            res.send(results)
-        })
 
 
         // Verify Sellers
@@ -151,6 +123,17 @@ async function run() {
          * Product Query Areas
          */
 
+        // Get Single Product Details
+        app.get('/product/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            const results = await productsCollection.findOne(query);
+            res.send(results)
+        })
+
+
+
+
         // // Get Advertise Product For Home Page 
         app.get('/products', async (req, res) => {
             const query = { 'advertisement': true, 'status': 'available' }
@@ -162,7 +145,7 @@ async function run() {
         app.get('/products/:category', async (req, res) => {
             const category = req.params.category
             const query = { category: category }
-            results = await productsCollection.find(query).toArray();
+            const results = await productsCollection.find(query).toArray();
             res.send(results)
         })
 
@@ -170,7 +153,7 @@ async function run() {
         app.get('/products/seller/:email', async (req, res) => {
             const email = req.params.email
             const query = { email: email }
-            results = await productsCollection.find(query).toArray();
+            const results = await productsCollection.find(query).toArray();
             res.send(results)
         })
 
@@ -186,11 +169,10 @@ async function run() {
 
 
         // // Advertise Data Product data
-        app.put('product/advertise/:id', async (req, res) => {
+        app.put('/products/advertise/:id', async (req, res) => {
             const id = req.params.id
             const data = req.body
             const filter = { _id: ObjectId(id) }
-            console.log(data)
             const options = { upsert: true }
             const updateDoc = {
                 $set: data
@@ -198,6 +180,40 @@ async function run() {
             const result = await productsCollection.updateOne(filter, updateDoc, options)
             res.send(result)
         })
+
+        // Add Reported Product
+        app.put('/product/reported/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true }
+            const data = req.body
+            const updateDoc = {
+                $set: data
+            }
+            const result = await productsCollection.updateOne(filter, updateDoc, options)
+            res.send(result)
+
+        })
+
+
+
+        // Get Reported Content
+        app.get('/products/reported/items', async (req, res) => {
+            const query = { reported: true }
+            results = await productsCollection.find(query).toArray();
+            res.send(results)
+        })
+
+        // Delete Reported Product
+        app.delete('/product/reported/item/:id', async (req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id) }
+            const result = await productsCollection.deleteOne(query)
+            res.send(result)
+
+
+        })
+
 
 
 
