@@ -11,7 +11,7 @@ const port = process.env.PORT || 5000
 // middlewares
 app.use(cors())
 app.use(express.json())
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
 
 
 // Z6oLpoNcLr6tcLSG
@@ -31,6 +31,7 @@ async function run() {
         const userCollection = client.db('cambazar').collection('users')
         const categoriesCollection = client.db('cambazar').collection('categories')
         const productsCollection = client.db('cambazar').collection('products')
+        const bookingsCollection = client.db('cambazar').collection('bookings')
 
         // Get Categories Data - Checked
         app.get('/categories', async (req, res) => {
@@ -38,6 +39,7 @@ async function run() {
             const result = await categoriesCollection.find(query).toArray();
             res.send(result);
         })
+
 
         // Get Single Category Details
         app.get('/category/:id', async (req, res) => {
@@ -47,13 +49,23 @@ async function run() {
             res.send(results)
         })
 
-        // //get all users
-        // app.get('/users', async (req, res) => {
-        //     const query = {};
-        //     const result = await userCollection.find(query).toArray();
-        //     res.send(result)
 
-        // })
+
+        app.post('/bookings', async (req, res) => {
+            const booking = req.body;
+            const result = await bookingsCollection.insertOne(booking);
+            res.send(result);
+        });
+
+        app.get('/bookings/:email', async (req, res) => {
+            const email = req.params.email
+            const query = { buyer_email: email }
+            const result = await bookingsCollection.find(query).toArray();
+            res.send(result);
+        });
+
+
+
 
         //get current login users data
         app.get('/user/:email', async (req, res) => {
@@ -220,6 +232,9 @@ async function run() {
 
 
         })
+
+
+
 
 
 
